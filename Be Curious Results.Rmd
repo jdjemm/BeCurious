@@ -1,0 +1,41 @@
+---
+title: "Be Curious Results"
+author: "Leeds Clinical Trials Research Unit"
+date: "07/05/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overall
+
+This is a bar chart. It shows us all the data from the different people we surveyed at Be Curious this year. The chart can give us an early idea on whether there might be a link between the chocolate groups and the different levels of happiness.
+
+Do you think there might be a link? Is everyone very happy? Are more people happy in Group A or Group B? Or are there a mix of answers?
+
+```{r overall, echo=FALSE}
+data()
+
+OverallPlotData <- data.frame(table(FakeData$Group, FakeData$OutcomeHappy.F))
+colnames(OverallPlotData) <- c("Chocolate Group", "Happy", "Freq")
+
+library(ggplot2)
+
+OverallPlot <- ggplot(OverallPlotData, aes(fill=`Chocolate Group`, x=Happy, y=Freq)) + 
+  geom_bar(position="dodge", stat="identity") + theme_minimal() + theme(plot.title = element_text(size = 12,hjust=0.5)) +
+  scale_fill_brewer(palette="Paired") + 
+  geom_text(aes(label=Freq), vjust=1.6, color="white", position = position_dodge(0.9), size=3.5) +
+  labs(title="Current Happiness by Chocolate Groups", x="Current Happiness", y="Number of Participants")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
