@@ -16,9 +16,12 @@ This is a bar chart. It shows us all the data from the different people we surve
 Do you think there might be a link? Is everyone very happy? Are more people happy in Group A or Group B? Or are there a mix of answers?
 
 ```{r overall, echo=FALSE}
-data()
+data<-read.csv('Be curious 2022 participant data.csv')
+data$Colour<-as.factor(data$Colour)
+data$Group<-as.factor(data$Group)
+data$How.Happy.Are.You.<-factor(data$How.Happy.Are.You., ordered=TRUE, labels=c("Not Happy","Happy","Very Happy"))
 
-OverallPlotData <- data.frame(table(FakeData$Group, FakeData$OutcomeHappy.F))
+OverallPlotData <- data.frame(table(data$Group, data$How.Happy.Are.You.))
 colnames(OverallPlotData) <- c("Chocolate Group", "Happy", "Freq")
 
 library(ggplot2)
