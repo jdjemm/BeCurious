@@ -321,7 +321,3 @@ fields <- c("Colour", "Group", "How Happy Are You?")
     
 # Run the application 
 shinyApp(ui = ui, server = server)
-
-
-
-
