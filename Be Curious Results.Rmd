@@ -31,6 +31,8 @@ OverallPlot <- ggplot(OverallPlotData, aes(fill=`Chocolate Group`, x=Happy, y=Fr
   scale_fill_brewer(palette="Paired") + 
   geom_text(aes(label=Freq), vjust=1.6, color="white", position = position_dodge(0.9), size=3.5) +
   labs(title="Current Happiness by Chocolate Groups", x="Current Happiness", y="Number of Participants")
+
+OverallPlot
 ```
 
 ## Including Plots
