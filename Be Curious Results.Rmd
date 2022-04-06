@@ -46,6 +46,8 @@ tt3 <- ttheme_minimal(
 
 table<-spread(OverallPlotData,key=Happy,value=Freq)
 tbl <- tableGrob(table, theme=tt3)
+
+
 grid.arrange(OverallPlot, tbl,
              nrow = 2,
              heights = c(1, 0.5))
