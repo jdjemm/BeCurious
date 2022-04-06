@@ -25,6 +25,10 @@ OverallPlotData <- data.frame(table(data$Group, data$How.Happy.Are.You.))
 colnames(OverallPlotData) <- c("Chocolate Group", "Happy", "Freq")
 
 library(ggplot2)
+library(scales)
+library(grid)
+library(gridExtra)
+library(tidyr)
 
 OverallPlot <- ggplot(OverallPlotData, aes(fill=`Chocolate Group`, x=Happy, y=Freq)) + 
   geom_bar(position="dodge", stat="identity") + theme_minimal() + theme(plot.title = element_text(size = 12,hjust=0.5)) +
@@ -32,12 +36,23 @@ OverallPlot <- ggplot(OverallPlotData, aes(fill=`Chocolate Group`, x=Happy, y=Fr
   geom_text(aes(label=Freq), vjust=1.6, color="white", position = position_dodge(0.9), size=3.5) +
   labs(title="Current Happiness by Chocolate Groups", x="Current Happiness", y="Number of Participants")
 
-OverallPlot
+
+tt3 <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(bg_params = list(fill = "navyblue", col=NA),
+               fg_params=list(col="white", fontface=4L)),
+  rowhead=list(fg_params=list(col="white", fontface=3L)))
+
+table<-spread(OverallPlotData,key=Happy,value=Freq)
+tbl <- tableGrob(table, theme=tt3)
+grid.arrange(OverallPlot, tbl,
+             nrow = 2,
+             heights = c(1, 0.5))
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
