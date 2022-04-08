@@ -45,6 +45,8 @@ tt3 <- ttheme_minimal(
   rowhead=list(fg_params=list(col="white", fontface=3L)))
 
 table<-spread(OverallPlotData,key=Happy,value=Freq)
+table[,5]<-rowSums(table[,2:4])
+colnames(table)[5]<-"Total"
 tbl <- tableGrob(table, theme=tt3)
 
 
@@ -53,11 +55,36 @@ grid.arrange(OverallPlot, tbl,
              heights = c(1, 0.5))
 ```
 
-
-
+Wasn't sure whether to have shiny element here so you could look at by colour group but don't know how to write this up, feel free to include if you know!
 
 ```{r pressure, echo=FALSE}
-plot(pressure)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We can also carry out a statistical test to help us decide if there might be a link (or association) between chocolate group and happiness. From the people we asked at Be Curious, our results were...
+
+```{r echo=FALSE}
+chisq <- chisq.test(table(data$Group, data$How.Happy.Are.You.))
+fishers <- fisher.test(table(data$Group, data$How.Happy.Are.You.))
+
+if(chisq$expected[1,1] < 5 || chisq$expected[1,2] < 5 || chisq$expected[1,3] < 5 || chisq$expected[2,1] < 5 || chisq$expected[2,2] < 5 || chisq$expected[2,3] < 5){
+  if(fishers$p.value<0.05){ans <- "Fishers Test: Happiness and Chocolate Group are not independent"}
+  else{ans <- "Fishers Test: Happiness and Chocolate Group are independent"}
+  
+}else{
+  if(chisq$p.value<0.05){ans <- "Chi-Squared Test: Happiness and Chocolate Group are not independent"}
+  else{ans <- "Chi-Squared Test: Happiness and Chocolate Group are independent"}
+}
+ans
+```
+#!DELETE ONE OF THESE ACCORDING TO THE RESULT!
+
+This means that there is not enough evidence to say that one chocolate group makes people happier than another. How did this compare to your thoughts from looking at the bar charts?
+
+This means there is evidence to say that there is a difference in how happy the two chocolate groups make people. How did this compare to your thoughts from looking at the bar charts?
+
+#!DO NOT DELETE FROM HERE!
+The issue from this test is that if we find the chocolate group to be independent, we don't know which group makes people happier than the other, all we would know is that there is a difference. We may also want to know whether there is a difference in peoples' answers based on their age, happiness before eating chocolate or their chocolate preferences.
+
+We can find out the answers to all of these questions too!
+
