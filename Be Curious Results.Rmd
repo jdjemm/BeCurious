@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Overall
+### Overall (suitable for 5+ years old)
 
 This is a bar chart. It shows us all the data from the different people we surveyed at Be Curious this year. The chart can give us an early idea on whether there might be a link between the chocolate groups and the different levels of happiness.
 
@@ -87,6 +87,8 @@ Wasn't sure whether to have shiny element here so you could look at by colour gr
 
 ```
 
+### Statistical test (suitable for X-Y years old)
+
 While the graphs give us an early idea about the data we've collected, the best way to find out if there's a difference in happiness between the two chocolate groups is to use a statistical test. This will to help us decide if there might be a link (or association) between chocolate group and happiness. From the people we asked at Be Curious, our results were...
 
 ```{r echo=FALSE}
@@ -104,13 +106,15 @@ if(chisq$expected[1,1] < 5 || chisq$expected[1,2] < 5 || chisq$expected[1,3] < 5
 ans
 ```
 <!-- #!DELETE ONE OF THESE ACCORDING TO THE RESULT! -->
-
 This means that there is not enough evidence to say that one chocolate group makes people happier than another. How did this compare to your thoughts from looking at the bar charts?
 
 This means there is evidence to say that there is a difference in how happy the two chocolate groups make people. How did this compare to your thoughts from looking at the bar charts?
 
 <!-- #!DO NOT DELETE FROM HERE! -->
 The issue from this test is that if we find the chocolate group to be independent, we don't know which group makes people happier than the other, all we would know is that there is a difference. We may also want to know whether there is a difference in peoples' answers based on their age, happiness before eating chocolate or their chocolate preferences.
+<br><br>
+
+### Statistical model (suitable for X-Y years old)
 
 We can find out the answers to all of these questions too! To do this, we will use a mathematical model which will produce odds ratios from which we can make our conclusions. Odds ratios show us how much more likely someone in one group (e.g. chocolate group, age group, happiness at the start of the activity) is to be happy after eating their chocolate compared to another group.
 
