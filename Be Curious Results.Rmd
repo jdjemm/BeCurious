@@ -30,6 +30,7 @@ library(grid)
 library(gridExtra)
 library(tidyr)
 library(gt)
+library(MASS)
 
 OverallPlot <- ggplot(OverallPlotData, aes(fill=`Chocolate Group`, x=Happy, y=Freq)) + 
   geom_bar(position="dodge", stat="identity") + theme_minimal() + theme(plot.title = element_text(size = 12,hjust=0.5)) +
@@ -119,3 +120,64 @@ The issue from this test is that if we find the chocolate group to be independen
 We can find out the answers to all of these questions too! To do this, we will use a mathematical model which will produce odds ratios from which we can make our conclusions. Odds ratios show us how much more likely someone in one group (e.g. chocolate group, age group, happiness at the start of the activity) is to be happy after eating their chocolate compared to another group.
 
 If there is no difference in happiness between the two chocolate groups then the odds ratio will be 1, we would interpret this result as 'the type of chocolate you have does not affect your happiness.' If the odds ratio is greater than 1, this means a person is more likely to be happy in Group B than in Group A. If the odds ratio is lower than 1 then a person is less likely to be happy in Group B  than in Group A. When making our conclusion, it is important we also take into account the 95% confidence interval of the odds ratio, that is the range of values that we are 95% confident the odds ratio sits between.
+
+Here our odds ratio is:
+```{r, echo=FALSE, include=FALSE}
+
+Chocolate <- c(0,1)
+Age <- c(0,1)
+BLHappy <- c(0,1,2)
+ColourGroups <- expand.grid(c(0,1,2), c(0,1),c(0,1))
+colnames(ColourGroups) <- c("BLHappy", "Age", "Chocolate")
+ColourGroups$Chocolate <- factor(ColourGroups$Chocolate, levels=c(0,1), labels=c("White","Milk"))
+ColourGroups$Age <- factor(ColourGroups$Age, levels=c(0,1), labels=c("Adult","Child"))
+ColourGroups$BLHappy <- factor(ColourGroups$BLHappy, levels=c(0,1,2), labels=c("Not Happy","Happy","Very Happy"))
+GroupID <- c("Sparkly Pink", "Orange", "Dark Blue", "Sparkly Purple", "Red", "Light Blue", "Teal", "Yellow", "Purple", "Sparkly Red", "Pink", "Green")
+ColourGroupData <- cbind(GroupID, ColourGroups)
+colnames(ColourGroupData) <- c("Colour", "BLHappy", "Age", "Chocolate")
+
+#Merge the baseline data with the outcome data
+ModelData <- merge(data, ColourGroupData)
+
+
+OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy, data=ModelData)
+# Obtain the model coefficients
+ctable <- coef(summary(OrdinalLogistic))
+# Obtain the p-values
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+# Calculate the confidence intervals
+ci <- confint.default(OrdinalLogistic)
+# Add in two extra rows to acount for the intercepts, these don't get a confidence interval.
+ci_merge <- rbind(ci, c(NA,NA),c(NA,NA))
+# Add the p-values and CI's into the coefficients table
+ctable_full <- cbind(ctable, ci_merge, "p value" = p)
+
+# Add this into the 
+#Exp everything so we can interpret it into odds
+exp_ctable <- exp(cbind(OR = coef(OrdinalLogistic), ci))
+#Add in the p-value
+ResultsTable <- merge(ctable_full, exp_ctable,by="row.names", all.x=TRUE)
+
+#Extract Chocolate and baselines
+ResultsSubset <- subset(ResultsTable, Row.names=="GroupB")
+ResultsSubset$ChocolateGroupResults <- paste(round(ResultsSubset$OR,3), " (",round(ResultsSubset$`2.5 %.y`,3), ", ",round(ResultsSubset$`97.5 %.y`,3),")")
+
+#Extract age 
+#ResultsSubsetage <- subset(ResultsTable, Row.names=="AgeChild")
+#ResultsSubsetage$AgeResults <- paste(round(ResultsSubsetage$OR,3), " (", round(ResultsSubsetage$`2.5 %.y`,3), ", ", round(ResultsSubsetage$`97.5 %.y`,3), ")")
+
+#print(ResultsSubset$ChocolateGroupResults)
+```
+```{r echo=FALSE}
+print(ResultsSubset$ChocolateGroupResults)
+```
+
+When interpreting the odds ratio, it is important that we also use the confidence interval in order to make a conclusion about our test. As we have used 95% confidence intervals here, we can say we are 95% sure (so pretty sure), that the real value is inside our confidence intervals, so bigger than XX but smaller than XX.
+
+Here, XX is the odds ratio and (XX - XX) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg does not affect happiness**.
+
+Here, XX is the odds ratio and (XX - XX) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg affects happiness**.
+
+In addition to this, We can also see the effect that age, happiness at the start of the activity and liking milk or white chocolate has on the outcome. For example, looking at the odds ratio and 95% confidence intervals for age:
+
+
