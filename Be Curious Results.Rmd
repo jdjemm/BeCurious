@@ -8,6 +8,11 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! The results will appear here shortly. 
+
+<!-- #!
+We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! Here are the results from our trial today.
+
 
 ### Overall (suitable for 5+ years old)
 
@@ -107,11 +112,13 @@ if(chisq$expected[1,1] < 5 || chisq$expected[1,2] < 5 || chisq$expected[1,3] < 5
 ans
 ```
 <!-- #!DELETE ONE OF THESE ACCORDING TO THE RESULT! -->
+<!-- #!
 This means that there is not enough evidence to say that one chocolate group makes people happier than another. How did this compare to your thoughts from looking at the bar charts?
 
 This means there is evidence to say that there is a difference in how happy the two chocolate groups make people. How did this compare to your thoughts from looking at the bar charts?
 
 <!-- #!DO NOT DELETE FROM HERE! -->
+<!-- #!
 The issue from this test is that if we find the chocolate group to be independent, we don't know which group makes people happier than the other, all we would know is that there is a difference. We may also want to know whether there is a difference in peoples' answers based on their age, happiness before eating chocolate or their chocolate preferences.
 <br><br>
 
@@ -139,8 +146,9 @@ colnames(ColourGroupData) <- c("Colour", "BLHappy", "Age", "Chocolate")
 #Merge the baseline data with the outcome data
 ModelData <- merge(data, ColourGroupData)
 
-
 OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy, data=ModelData)
+#OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy + Age + Chocolate, data=ModelData)
+
 # Obtain the model coefficients
 ctable <- coef(summary(OrdinalLogistic))
 # Obtain the p-values
@@ -174,10 +182,39 @@ print(ResultsSubset$ChocolateGroupResults)
 
 When interpreting the odds ratio, it is important that we also use the confidence interval in order to make a conclusion about our test. As we have used 95% confidence intervals here, we can say we are 95% sure (so pretty sure), that the real value is inside our confidence intervals, so bigger than XX but smaller than XX.
 
+<!-- #!DELETE ONE OF THESE ACCORDING TO THE RESULT! -->
+<!-- #!
 Here, XX is the odds ratio and (XX - XX) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg does not affect happiness**.
 
 Here, XX is the odds ratio and (XX - XX) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg affects happiness**.
 
-In addition to this, We can also see the effect that age, happiness at the start of the activity and liking milk or white chocolate has on the outcome. For example, looking at the odds ratio and 95% confidence intervals for age:
+In addition to this, We can also see the effect that age, happiness at the start of the activity and liking milk or white chocolate has on the outcome. Putting these into a table, we can see the following:
+```{r echo=FALSE}
+ResultsTable$ChocolateGroupResults <- paste(round(ResultsTable$OR,3), " (",round(ResultsTable$`2.5 %.y`,3), ", ",round(ResultsTable$`97.5 %.y`,3),")")
+col1 <- c("Age", "Baseline happiness", "Chocolate preference")
+col2 <- c("Child vs Adult", "Very happy vs Unhappy", "Milk vs White")
+CIdata <- as.data.frame(cbind(col1, col2, ResultsTable[c(1,3,4),c(11)]))
+colnames(CIdata)<-c("Variable", "Comparison", "Odds Ratio (95% CI)")
 
+tbl2<-CIdata %>%
+  gt() %>%
+    cols_width(
+      Variable ~ px(200),
+      Comparison ~ px(200)
+    )
 
+tbl2
+```
+<br><br>
+<!-- #!DELETE AS APPROPRIATE !-->
+<!-- #!
+As we can see, 1 is within all confidence intervals and therefore none of the variables we recorded at baseline are deemed to have a significant effect on happiness after eating chocolate. While it may not seem as interesting, science is often about being able to rule out associations as well as prove them.
+
+As we can see, 1 is within the confidence interval for XX but is not within the interval for XX. This means that while there is not an association between XX and happiness after eating chocolate, there is an association between XX and happiness after eating chocolate.
+
+So we can conclude that from the group we tested, people who were very happy before eating chocolate are more likely to be happy after eating chocolate in comparison to someone who is unhappy before eating chocolate.
+
+So we can conclude that from the group we tested, children are more likely to be happy after eating chocolate in comparison to adults.
+
+So we can conclude that from the group we tested, people who prefer to eat milk chocolate over white chocolate are more likely to be happy after eating chocolate in comparison to someone who prefers white chocolate.
+!-->
