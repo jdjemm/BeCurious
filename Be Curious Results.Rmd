@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! The results will appear here shortly. 
+We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! The results will appear here shortly.
 
 <!-- #!
 We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! Here are the results from our trial today.
@@ -218,3 +218,8 @@ So we can conclude that from the group we tested, children are more likely to be
 
 So we can conclude that from the group we tested, people who prefer to eat milk chocolate over white chocolate are more likely to be happy after eating chocolate in comparison to someone who prefers white chocolate.
 !-->
+
+<br><br>
+<center>
+<img src="CTRU-logo-UoL.png" width="300"/>
+</center>
