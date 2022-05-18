@@ -8,23 +8,51 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! The results will appear here shortly.
-
 <!-- #!
-We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! Here are the results from our trial today.
+We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! The results will appear here shortly.
+!-->
 
+We hope you enjoyed taking part in our chocolate egg clinical trial at Be Curious! Here are the results from our trial.
 
-### Overall (suitable for 5+ years old)
+### Overall summary
+```{r echo=FALSE}
+colFmt <- function(x,color) {
+  
+  outputFormat <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  
+  if(outputFormat == 'latex') {
+    ret <- paste("\\textcolor{",color,"}{",x,"}",sep="")
+  } else if(outputFormat == 'html') {
+    ret <- paste("<font color='",color,"'>",x,"</font>",sep="")
+  } else {
+    ret <- x
+  }
 
-This is a bar chart. It shows us all the data from the different people we surveyed at Be Curious this year. The chart can give us an early idea on whether there might be a link between the chocolate groups and the different levels of happiness.
+  return(ret)
+}
+```
+* We had `r colFmt("130",'blue')` participants take part in our Chocolate trial at Be Curious. `r colFmt("61",'blue')` were given white chocolate and `r colFmt("69",'blue')` were given milk chocolate.
+* Only `r colFmt("2 participants",'red')`  were not happy after eating their chocolate!
+* We saw `r colFmt("no difference",'purple')` in happiness between the two chocolate groups. This means `r colFmt("chocolate makes people happy",'darkpink')`, no matter what!
 
-Do you think there might be a link? Is everyone very happy? Are more people happy in Group A or Group B? Or are there a mix of answers?
+<br>
+
+### Graph summaries (suitable for 5+ years old)
+
+This is a bar chart. It shows us all the information from the different people we surveyed at Be Curious this year. The chart can give us an early idea on whether there might be a link between the chocolate groups and the different levels of happiness.
+
+Do you think there might be a link? Is everyone very happy? Are more people happy after eating white chocolate or milk chocolate? Or are there a mix of answers?
 
 ```{r overall, echo=FALSE, fig.show="hold"}
-data<-read.csv('Be curious 2022 participant data.csv')
+data<-read.csv('Be curious 2022 participant 20220507.txt')
 data$Colour<-as.factor(data$Colour)
+for(i in 1:nrow(data)){
+  if(isTRUE(data$Group[i]=="A")){data$Group[i]<-"White chocolate"}
+  if(isTRUE(data$Group[i]=="B")){data$Group[i]<-"Milk chocolate"}
+}
 data$Group<-as.factor(data$Group)
-data$How.Happy.Are.You.<-factor(data$How.Happy.Are.You., ordered=TRUE, labels=c("Not Happy","Happy","Very Happy"))
+data$How.Happy.Are.You.<-factor(data$How.Happy.Are.You.)
+data$How.Happy.Are.You.<-relevel(data$How.Happy.Are.You., "Not Happy")
 
 OverallPlotData <- data.frame(table(data$Group, data$How.Happy.Are.You.))
 colnames(OverallPlotData) <- c("Chocolate Group", "Happy", "Freq")
@@ -40,7 +68,7 @@ library(MASS)
 OverallPlot <- ggplot(OverallPlotData, aes(fill=`Chocolate Group`, x=Happy, y=Freq)) + 
   geom_bar(position="dodge", stat="identity") + theme_minimal() + theme(plot.title = element_text(size = 12,hjust=0.5)) +
   scale_fill_brewer(palette="Paired") + 
-  geom_text(aes(label=Freq), vjust=1.6, color="white", position = position_dodge(0.9), size=3.5) +
+  geom_text(aes(label=Freq), vjust=-0.3, color="black", position = position_dodge(0.9), size=3.5) +
   labs(title="Current Happiness by Chocolate Groups", x="Current Happiness", y="Number of Participants")
 
 OverallPlot
@@ -50,6 +78,7 @@ OverallPlot
 
 Or we could set the data up as a table:
 ```{r, echo=FALSE}
+
 table<-spread(OverallPlotData,key=Happy,value=Freq)
 table[,5]<-rowSums(table[,2:4])
 colnames(table)[5]<-"Total"
@@ -63,17 +92,19 @@ tbl<-table %>%
 
 tbl
 ```
+
 <br><br>
 
-We can also summarise the data by colour group to see how many people from each group took part in the study. Do some colour groups have more people in than others?
+We can also look at the data by colour group to see how many people from each group took part in the study. Do some colour groups have more people in than others? Remember colour groups were decided by age (adult/child), chocolate preference (milk/white chocolate) and happiness before eating chocolate (not happy/happy/very happy). The biggest group was the pink group, these were children who were happy before eating chocolate and preferred milk chocolate.
 
 ```{r, echo=FALSE}
+
 PlotColours = c("Sparkly Pink" = rgb(255,0,102, maxColorValue=255), "Orange" = rgb(255,122,31, maxColorValue=255), "Dark Blue"= rgb(68,117,161, maxColorValue=255), "Sparkly Purple"= rgb(153,51,102, maxColorValue=255), "Red"= rgb(255,0,0, maxColorValue=255), "Light Blue"= rgb(190,215,239, maxColorValue=255), "Teal" = rgb(0,128,128, maxColorValue=255), "Yellow" = rgb(255,255,25, maxColorValue=255), "Purple" = rgb(204,153,255, maxColorValue=255), "Sparkly Red" = rgb(255,0,0, maxColorValue=255), "Pink" = rgb(255,153,204, maxColorValue=255), "Green" = rgb(146,208,80, maxColorValue=255))
 PlotLabels = c("Sparkly Pink" = "Sparkly\nPink" , "Orange" = "Orange", "Dark Blue"= "Dark\nBlue", "Sparkly Purple"= "Sparkly\nPurple", "Red"= "Red", "Light Blue"= "Light\nBlue", "Teal" = "Teal", "Yellow" = "Yellow", "Purple" = "Purple", "Sparkly Red" = "Sparkly\nRed", "Pink" = "Pink", "Green" = "Green")
 
 SummaryPlot <- ggplot(data=data, aes(x=Colour,fill=Colour)) +
   geom_bar(stat="count") +
-  geom_text(stat="count", aes(label=..count..), vjust=1.6, color="black", position = position_dodge(0.9), size=3.5) +
+  geom_text(stat="count", aes(label=..count..), vjust=-0.6, color="black", position = position_dodge(1), size=3.5) +
   theme_minimal() +
   scale_fill_manual(values = PlotColours, aesthetics = "fill") +
   theme(axis.text.x = element_text(size=10), legend.position = "none", plot.title = element_text(size = 12,hjust=0.5)) +
@@ -87,17 +118,12 @@ SummaryPlot
 ```
 
 
-Wasn't sure whether to have shiny element here so you could look at by colour group but don't know how to write this up, feel free to include if you know!
+### Statistical test (suitable for 11-16 years old)
 
-```{r pressure, echo=FALSE}
+While the graphs give us an early idea about the information we've collected, the best way to find out if there's a difference in happiness between the two chocolate groups is to use a statistical test. This will to help us decide if there might be a link (sometimes called an association) between chocolate group and happiness. From the people we asked at Be Curious, the results were...
 
-```
+```{r echo=FALSE, warning=FALSE}
 
-### Statistical test (suitable for X-Y years old)
-
-While the graphs give us an early idea about the data we've collected, the best way to find out if there's a difference in happiness between the two chocolate groups is to use a statistical test. This will to help us decide if there might be a link (or association) between chocolate group and happiness. From the people we asked at Be Curious, our results were...
-
-```{r echo=FALSE}
 chisq <- chisq.test(table(data$Group, data$How.Happy.Are.You.))
 fishers <- fisher.test(table(data$Group, data$How.Happy.Are.You.))
 
@@ -111,22 +137,17 @@ if(chisq$expected[1,1] < 5 || chisq$expected[1,2] < 5 || chisq$expected[1,3] < 5
 }
 ans
 ```
-<!-- #!DELETE ONE OF THESE ACCORDING TO THE RESULT! -->
-<!-- #!
+
 This means that there is not enough evidence to say that one chocolate group makes people happier than another. How did this compare to your thoughts from looking at the bar charts?
 
-This means there is evidence to say that there is a difference in how happy the two chocolate groups make people. How did this compare to your thoughts from looking at the bar charts?
-
-<!-- #!DO NOT DELETE FROM HERE! -->
-<!-- #!
-The issue from this test is that if we find the chocolate group to be independent, we don't know which group makes people happier than the other, all we would know is that there is a difference. We may also want to know whether there is a difference in peoples' answers based on their age, happiness before eating chocolate or their chocolate preferences.
+The issue from this test is that if we found the chocolate groups not to be independent, we wouldn't know which group makes people happier than the other, all we would know is that there is a difference. We may also want to know whether there is a difference in peoples' answers based on their age, happiness before eating chocolate or their chocolate preferences.
 <br><br>
 
-### Statistical model (suitable for X-Y years old)
+### Statistical model (suitable for 16+ years)
 
-We can find out the answers to all of these questions too! To do this, we will use a mathematical model which will produce odds ratios from which we can make our conclusions. Odds ratios show us how much more likely someone in one group (e.g. chocolate group, age group, happiness at the start of the activity) is to be happy after eating their chocolate compared to another group.
+We can find out the answers to all of these questions too! To do this, we will use a statistical model which will produce odds ratios from which we can make our conclusions. Odds ratios show us how much more likely someone in one group (e.g. chocolate group, age group, happiness at the start of the activity) is to be happy after eating their chocolate compared to another group.
 
-If there is no difference in happiness between the two chocolate groups then the odds ratio will be 1, we would interpret this result as 'the type of chocolate you have does not affect your happiness.' If the odds ratio is greater than 1, this means a person is more likely to be happy in Group B than in Group A. If the odds ratio is lower than 1 then a person is less likely to be happy in Group B  than in Group A. When making our conclusion, it is important we also take into account the 95% confidence interval of the odds ratio, that is the range of values that we are 95% confident the odds ratio sits between.
+If there is no difference in happiness between the two chocolate groups then the odds ratio will be 1, we would interpret this result as 'the type of chocolate you have does not affect your happiness.' If the odds ratio is greater than 1, this means a person is more likely to be happy in the milk chocolate group than in the white chocolate group. If the odds ratio is lower than 1 then a person is less likely to be happy in the milk chocolate group  than in the white chocolate group. When making our conclusion, it is important we also take into account the 95% confidence interval of the odds ratio, that is the range of values that we are 95% confident the odds ratio sits between. We need the confidence interval because we haven’t asked everyone our question so we only know what the result might be rather than what it definitely is. 
 
 Here our odds ratio is:
 ```{r, echo=FALSE, include=FALSE}
@@ -146,8 +167,8 @@ colnames(ColourGroupData) <- c("Colour", "BLHappy", "Age", "Chocolate")
 #Merge the baseline data with the outcome data
 ModelData <- merge(data, ColourGroupData)
 
-OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy, data=ModelData)
-#OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy + Age + Chocolate, data=ModelData)
+#OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy, data=ModelData)
+OrdinalLogistic <- polr(How.Happy.Are.You. ~ Group + BLHappy + Age + Chocolate, data=ModelData)
 
 # Obtain the model coefficients
 ctable <- coef(summary(OrdinalLogistic))
@@ -167,7 +188,7 @@ exp_ctable <- exp(cbind(OR = coef(OrdinalLogistic), ci))
 ResultsTable <- merge(ctable_full, exp_ctable,by="row.names", all.x=TRUE)
 
 #Extract Chocolate and baselines
-ResultsSubset <- subset(ResultsTable, Row.names=="GroupB")
+ResultsSubset <- subset(ResultsTable, Row.names=="ChocolateMilk")
 ResultsSubset$ChocolateGroupResults <- paste(round(ResultsSubset$OR,3), " (",round(ResultsSubset$`2.5 %.y`,3), ", ",round(ResultsSubset$`97.5 %.y`,3),")")
 
 #Extract age 
@@ -180,15 +201,14 @@ ResultsSubset$ChocolateGroupResults <- paste(round(ResultsSubset$OR,3), " (",rou
 print(ResultsSubset$ChocolateGroupResults)
 ```
 
-When interpreting the odds ratio, it is important that we also use the confidence interval in order to make a conclusion about our test. As we have used 95% confidence intervals here, we can say we are 95% sure (so pretty sure), that the real value is inside our confidence intervals, so bigger than XX but smaller than XX.
+When interpreting the odds ratio, it is important that we also use the confidence interval in order to make a conclusion about our test. As we have used 95% confidence intervals here, we can say we are 95% sure (so pretty sure), that the real value is inside our confidence intervals, so bigger than 0.662 but smaller than 3.308.
 
-<!-- #!DELETE ONE OF THESE ACCORDING TO THE RESULT! -->
-<!-- #!
-Here, XX is the odds ratio and (XX - XX) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg does not affect happiness**.
 
-Here, XX is the odds ratio and (XX - XX) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg affects happiness**.
+Here, 1.48 is the odds ratio and (0.662 - 3.308) is the confidence interval. As we can see, 1 is within the confidence interval. This means that **type of chocolate egg does not affect happiness**.
 
 In addition to this, We can also see the effect that age, happiness at the start of the activity and liking milk or white chocolate has on the outcome. Putting these into a table, we can see the following:
+
+<br>
 ```{r echo=FALSE}
 ResultsTable$ChocolateGroupResults <- paste(round(ResultsTable$OR,3), " (",round(ResultsTable$`2.5 %.y`,3), ", ",round(ResultsTable$`97.5 %.y`,3),")")
 col1 <- c("Age", "Baseline happiness", "Chocolate preference")
@@ -205,19 +225,11 @@ tbl2<-CIdata %>%
 
 tbl2
 ```
+<br>
+
+As we can see, 1 is within all confidence intervals and therefore none of the variables we recorded at baseline are deemed to have a significant effect on happiness after eating chocolate. While it may not seem as interesting, science is often about being able to rule out associations as well as prove them. 
 <br><br>
-<!-- #!DELETE AS APPROPRIATE !-->
-<!-- #!
-As we can see, 1 is within all confidence intervals and therefore none of the variables we recorded at baseline are deemed to have a significant effect on happiness after eating chocolate. While it may not seem as interesting, science is often about being able to rule out associations as well as prove them.
-
-As we can see, 1 is within the confidence interval for XX but is not within the interval for XX. This means that while there is not an association between XX and happiness after eating chocolate, there is an association between XX and happiness after eating chocolate.
-
-So we can conclude that from the group we tested, people who were very happy before eating chocolate are more likely to be happy after eating chocolate in comparison to someone who is unhappy before eating chocolate.
-
-So we can conclude that from the group we tested, children are more likely to be happy after eating chocolate in comparison to adults.
-
-So we can conclude that from the group we tested, people who prefer to eat milk chocolate over white chocolate are more likely to be happy after eating chocolate in comparison to someone who prefers white chocolate.
-!-->
+DISCLAIMER: This does not constitute a real clinical trial and thus the results should not be taken to make any true claim on chocolate preference.
 
 <br><br>
 <center>
